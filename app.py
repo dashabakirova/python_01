@@ -9,51 +9,53 @@ import json
 
 class MyWindow:
     objects = []
+    # В параметре 'parametrs' объекта индекс 0 - значение v, индекс 1 - q, индекс 2 - k, индекс 3 - prop (доля)
     browsed_object = ()
 
     def __init__(self, win):
-        # РїРµСЂРµРјРµРЅРЅР°СЏ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РѕР±СЉРµРєС‚РѕРІ
+        # переменная для хранения объектов
         self.win = win
 
-        # РїРµСЂРµРјРµРЅРЅС‹Рµ РѕРєРЅР° РІРІРѕРґР° РїР°СЂР°РјРµС‚СЂРѕРІ РќРџРЎ
+        # переменные окна ввода параметров НПС
         self.lb_v, self.inp_v, self.lb_prop, self.lb_q, self.inp_q = [], [], [], [], []
         self.btn_del, self.lb_source_q, self.jj = [], [], []
         self.lb_a, self.lb_b, self.lb_n, self.lb_z = [], [], [], []
         self.inp_a, self.inp_b, self.inp_n, self.inp_z = [], [], [], []
         self.outputs = []
+        self.lb_available, self.lb_sum_prop, self.lb_remain = None, None, None
 
-        # РїРµСЂРµРјРµРЅРЅС‹Рµ РѕРєРЅР° РІСЏР·РєРѕСЃС‚Рё
+        # переменные окна вязкости
         self.viscosity_win = None
         self.lb_v_vs, self.inp_k = [], []
 
-        # РїР°СЂР°РјРµС‚СЂС‹ С…РѕР»СЃС‚Р°
+        # параметры холста
         self.canvas = packObject(Canvas, win, 0, 0, {"bg": "white", "bd": 2, "width": 900, "height": 598})
         self.canvas.create_rectangle(0, 0, 1000, 698, fill="white")
 
-        # Р›РµР№Р±Р»С‹
-        self.lb_object = packObject(Label, win, 920, 30, {"text": "РћР±СЉРµРєС‚"})
-        self.lb_event = packObject(Label, win, 920, 100, {"text": "Р”РµР№СЃС‚РІРёРµ"})
-        self.lb_obj_param = packObject(Label, win, 920, 170, {"text": "РџР°СЂР°РјРµС‚СЂС‹ РѕР±СЉРµРєС‚Р°"})
-        self.lb_tp_length = packObject(Label, win, 940, 260, {"text": "Р”Р»РёРЅР° L, РєРј:"})
-        self.lb_NPC1 = packObject(Label, win, 940, 195, {"text": "РќРџРЎ 1:"})
-        self.lb_NPC2 = packObject(Label, win, 940, 225, {"text": "РќРџРЎ 2:"})
-        self.lb_diameter = packObject(Label, win, 940, 290, {"text": 'Р”РёР°РјРµС‚СЂ, РјРј:'})
-        self.lb_G = packObject(Label, win, 940, 320, {"text": 'G, РјР»РЅ.С‚:'})
+        # Лейблы
+        self.lb_object = packObject(Label, win, 920, 30, {"text": "Объект"})
+        self.lb_event = packObject(Label, win, 920, 100, {"text": "Действие"})
+        self.lb_obj_param = packObject(Label, win, 920, 170, {"text": "Параметры объекта"})
+        self.lb_tp_length = packObject(Label, win, 940, 260, {"text": "Длина L, км:"})
+        self.lb_NPC1 = packObject(Label, win, 940, 195, {"text": "НПС 1:"})
+        self.lb_NPC2 = packObject(Label, win, 940, 225, {"text": "НПС 2:"})
+        self.lb_diameter = packObject(Label, win, 940, 290, {"text": 'Диаметр, мм:'})
+        self.lb_G = packObject(Label, win, 940, 320, {"text": 'G, млн.т:'})
         self.lb_id = packObject(Label, win, 940, 195, {"text": "id:"})
-        self.lb_name = packObject(Label, win, 940, 225, {"text": 'РќР°Р·РІР°РЅРёРµ:'})
-        # self.lb_len_point = packObject(Label, win, 940, 255, {"text": 'Р’С‹СЃРѕС‚Р° РѕС‚РјРµС‚РєРё, z:'})
-        self.lb_inputs = packObject(Label, win, 940, 285, {"text": 'Р’С…РѕРґ:'})
-        self.lb_outputs = packObject(Label, win, 940, 315, {"text": 'Р’С‹С…РѕРґ:'})
-        # self.lb_param_a = packObject(Label, win, 940, 345, {"text": 'РџР°СЂР°РјРµС‚СЂ a:'})
-        # self.lb_param_b = packObject(Label, win, 940, 375, {"text": 'РџР°СЂР°РјРµС‚СЂ b:'})
-        # self.lb_param_n = packObject(Label, win, 940, 405, {"text": 'РџР°СЂР°РјРµС‚СЂ n:'})
-        # self.lb_param_t = packObject(Label, win, 940, 435, {"text": 'РџР°СЂР°РјРµС‚СЂ t:'})
-        self.lb_param_t = packObject(Label, win, 940, 345, {"text": 'РџР°СЂР°РјРµС‚СЂ t:'})
+        self.lb_name = packObject(Label, win, 940, 225, {"text": 'Название:'})
+        # self.lb_len_point = packObject(Label, win, 940, 255, {"text": 'Высота отметки, z:'})
+        self.lb_inputs = packObject(Label, win, 940, 285, {"text": 'Вход:'})
+        self.lb_outputs = packObject(Label, win, 940, 315, {"text": 'Выход:'})
+        # self.lb_param_a = packObject(Label, win, 940, 345, {"text": 'Параметр a:'})
+        # self.lb_param_b = packObject(Label, win, 940, 375, {"text": 'Параметр b:'})
+        # self.lb_param_n = packObject(Label, win, 940, 405, {"text": 'Параметр n:'})
+        # self.lb_param_t = packObject(Label, win, 940, 435, {"text": 'Параметр t:'})
+        self.lb_param_t = packObject(Label, win, 940, 345, {"text": 'Параметр t:'})
 
         self.lb_Q = packObject(Label, win, 1040, 470, {"text": "Q = "})
         self.lb_V = packObject(Label, win, 1040, 440, {"text": "V = "})
 
-        # РћРїСЂРµРґРµР»РµРЅРёРµ С‚РёРїРѕРІ РґР°РЅРЅС‹С… С„РѕСЂРјС‹
+        # Определение типов данных формы
         self.inp_id = StringVar(win)
         self.inp_name = StringVar(win)
         self.inp_tp_lenth = StringVar(win)
@@ -69,7 +71,7 @@ class MyWindow:
         self.inp_tp_G = StringVar(win)
         self.radio1, self.radio2 = IntVar(), IntVar()
 
-        # РџРѕР»СЏ РІРІРѕРґР° РґР°РЅРЅС‹С… С„РѕСЂРјС‹
+        # Поля ввода данных формы
         self.id = packObject(Entry, win, 1070, 195, {"width": "10", "textvariable": self.inp_id})
         self.name = packObject(Entry, win, 1070, 225, {"width": "10", "textvariable": self.inp_name})
         # self.npc_lenthPoint = packObject(Entry, win, 1070, 255, {"width": "10", "textvariable": self.inp_lenghPoint})
@@ -85,51 +87,54 @@ class MyWindow:
         self.tp_G = packObject(Entry, win, 1070, 320, {"width": "10", "textvariable": self.inp_tp_G})
         self.tp_lenth = packObject(Entry, win, 1070, 260, {"width": "10", "textvariable": self.inp_tp_lenth})
 
-        # Р Р°РґРёРѕРјРµС‚РєРё
-        # self.r1 = packObject(Radiobutton, win, 940, 30, {"variable": self.radio1, "text": "РќРџРЎ", "value": 0,
+        # Радиометки
+        # self.r1 = packObject(Radiobutton, win, 940, 30, {"variable": self.radio1, "text": "НПС", "value": 0,
         #                                                  "command": self.updateParametrs})
-        self.r5 = packObject(Radiobutton, win, 940, 50, {"variable": self.radio1, "text": "РќРџРЎ c СЂРµР·РµСЂРІСѓР°СЂРЅС‹Рј РїР°СЂРєРѕРј",
+        self.r5 = packObject(Radiobutton, win, 940, 50, {"variable": self.radio1, "text": "НПС c резервуарным парком",
                                                          "value": 1, "command": self.updateParametrs})
-        self.r2 = packObject(Radiobutton, win, 940, 70, {"variable": self.radio1, "text": "РўСЂСѓР±РѕРїСЂРѕРІРѕРґ", "value": 2,
+        self.r2 = packObject(Radiobutton, win, 940, 70, {"variable": self.radio1, "text": "Трубопровод", "value": 2,
                                                          "command": self.updateParametrs})
-        self.r3 = packObject(Radiobutton, win, 940, 120, {"variable": self.radio2, "text": "Р”РѕР±Р°РІР»РµРЅРёРµ", "value": 0,
+        self.r3 = packObject(Radiobutton, win, 940, 120, {"variable": self.radio2, "text": "Добавление", "value": 0,
                                                           "command": self.updateParametrs})
-        self.r4 = packObject(Radiobutton, win, 940, 140, {"variable": self.radio2, "text": "РР·РјРµРЅРёС‚СЊ", "value": 1,
+        self.r4 = packObject(Radiobutton, win, 940, 140, {"variable": self.radio2, "text": "Изменить", "value": 1,
                                                           "command": self.updateParametrs})
 
-        # РљРЅРѕРїРєРё
+        # Кнопки
         self.btn_add_object = packObject(Button, win, 940, 380, {
-            "width": "12", "height": "1", "text": "Р”РѕР±Р°РІРёС‚СЊ", "command": self.add_object
+            "width": "12", "height": "1", "text": "Добавить", "command": self.add_object
         })
         self.btn_calc_V = packObject(Button, win, 940, 440, {
-            "width": "12", "height": "1", "text": "Р Р°СЃСЃС‡РёС‚Р°С‚СЊ V", "command": self.calc_v
+            "width": "12", "height": "1", "text": "Рассчитать V", "command": self.calc_v
         })
         self.btn_add_param = packObject(Button, win, 940, 470, {
-            "width": "12", "height": "1", "text": "Р”РѕР±Р°РІРёС‚СЊ q, v", "command": self.param_npc
+            "width": "12", "height": "1", "text": "Добавить q, v", "command": self.param_npc
         })
         self.btn_calc_Q = packObject(Button, win, 940, 470, {
-            "width": "12", "height": "1", "text": "Р Р°СЃСЃС‡РёС‚Р°С‚СЊ Q", "command": self.calc_q
+            "width": "12", "height": "1", "text": "Рассчитать Q", "command": self.calc_q
         })
         self.btn_update_object = packObject(Button, win, 940, 500, {
-            "width": "12", "height": "1", "text": "РћР±РЅРѕРІРёС‚СЊ", "command": self.editobject
+            "width": "12", "height": "1", "text": "Обновить", "command": self.editobject
         })
         self.btn_remove_object = packObject(Button, win, 1040, 500, {
-            "width": "12", "height": "1", "text": "РЈРґР°Р»РёС‚СЊ", "command": self.removeobject
+            "width": "12", "height": "1", "text": "Удалить", "command": self.removeobject
         })
         self.btn_clear = packObject(Button, win, 940, 530, {
-            "width": "12", "height": "1", "text": "РћС‡РёСЃС‚РёС‚СЊ", "command": self.clear
+            "width": "12", "height": "1", "text": "Очистить", "command": self.clear
         })
         self.btn_viscosity = packObject(Button, win, 1040, 530, {
-            "width": "12", "height": "1", "text": "Р’СЏР·РєРѕСЃС‚СЊ", "command": self.viscosity
+            "width": "12", "height": "1", "text": "Вязкость", "command": self.viscosity
         })
         self.btn_conf_import = packObject(Button, win, 1040, 560, {
-            "width": "12", "height": "1", "text": "РћС‚РєСЂС‹С‚СЊ", "command": self.import_conf
+            "width": "12", "height": "1", "text": "Открыть", "command": self.import_conf
         })
         self.btn_conf_export = packObject(Button, win, 940, 560, {
-            "width": "12", "height": "1", "text": "РЎРѕС…СЂР°РЅРёС‚СЊ", "command": self.export_conf
+            "width": "12", "height": "1", "text": "Сохранить", "command": self.export_conf
+        })
+        self.btn_calculate = packObject(Button, win, 940, 590, {
+            "width": "26", "height": "1", "text": "Выполнить расчёт", "command": self.calculate
         })
 
-        # РЎРѕР±С‹С‚РёСЏ
+        # События
         self.canvas.bind("<Button-1>", self.click)
         self.canvas.bind("<Button-3>", self.rclick)
         self.canvas.bind("<Motion>", self.motion)
@@ -137,7 +142,7 @@ class MyWindow:
         self.canvas.bind("<Delete>", self.removeobject)
         self.updateParametrs()
 
-        # Р—РЅР°С‡РµРЅРёСЏ РґР°РЅРЅС‹С… С„РѕСЂРјС‹
+        # Значения данных формы
         # self.inp_tp_second.set(0)
         self.inp_tp_first.set(0)
         self.inp_tp_second.set(0)
@@ -149,14 +154,37 @@ class MyWindow:
         self.radio1.set(0)
         self.radio2.set(0)
 
-        # РџРµСЂРµРјРµРЅРЅР°СЏ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РїР°СЂР°РјРµС‚СЂР° "c"
+        # Переменная для хранения параметра "c"
         self.c = -4.5
 
-    def calc_v(self):
-        self.lb_V['text'] = 'Р Р°СЃСЃС‡РёС‚С‹РІР°СЋ...'
+    def calculate(self):
+        # Расчёт долей и t
+        curr_obj = self.browsed_object
+        npc_list = [obj for obj in self.objects if obj['type'] == 'NPC_RP']
+        for npc in npc_list:
+            self.browsed_object = npc
+            self.calc_prop(self.browsed_object, 0, save_flag=True)
+        self.browsed_object = curr_obj
+
+        tp_list = [obj for obj in self.objects if obj['type'] == 'tp']
+
+        # Расчёт V
+        for tp in tp_list:
+            self.calc_v(source_id=tp['npc1'], target_id=tp['npc2'])
+
+        # Расчёт Q
+        for tp in tp_list:
+            self.calc_q(source_id=tp['npc1'], target_id=tp['npc2'])
+
+        # Сообщение о завершении выполнения расчёта
+        messagebox.showinfo('Расчёт завершён', 'Процедура расчёта завершена!')
+
+    def calc_v(self, source_id=None, target_id=None):
+        self.lb_V['text'] = 'Рассчитываю...'
         v = 0
-        source_id = self.inp_tp_first.get()
-        target_id = self.inp_tp_second.get()
+        if source_id is None and target_id is None:
+            source_id = self.inp_tp_first.get()
+            target_id = self.inp_tp_second.get()
         tp = self.getTP(source_id, target_id)
         if tp:
             target = self.getObj(target_id)
@@ -174,14 +202,15 @@ class MyWindow:
                 target['input_qv'] = {}
             target['input_qv']['v'] = v
             self.canvas_update()
-        self.lb_V['text'] = 'Р Р°СЃСЃС‡РёС‚Р°РЅРѕ'
+        self.lb_V['text'] = 'Рассчитано'
 
-    # С„СѓРЅРєС†РёСЏ СЂР°СЃС‡РµС‚Р° РЅР°РїРѕСЂР°
-    def calc_q(self):
-        self.lb_Q['text'] = 'Р Р°СЃСЃС‡РёС‚С‹РІР°СЋ...'
+    # функция расчета напора
+    def calc_q(self, source_id=None, target_id=None):
+        self.lb_Q['text'] = 'Рассчитываю...'
         # q = 0
-        source_id = self.inp_tp_first.get()
-        target_id = self.inp_tp_second.get()
+        if source_id is None and target_id is None:
+            source_id = self.inp_tp_first.get()
+            target_id = self.inp_tp_second.get()
         tp = self.getTP(source_id, target_id)
         if tp:
             source = self.getObj(source_id)
@@ -218,16 +247,16 @@ class MyWindow:
                     target['input_qv'] = {}
                 target['input_qv']['q'] = q
                 self.canvas_update()
-        self.lb_Q['text'] = 'Р Р°СЃСЃС‡РёС‚Р°РЅРѕ'
+        self.lb_Q['text'] = 'Рассчитано'
         # return 0
 
     def viscosity(self):
         self.viscosity_win = Toplevel()
-        self.viscosity_win.title('Р’СЏР·РєРѕСЃС‚СЊ')
+        self.viscosity_win.title('Вязкость')
         self.viscosity_win.resizable(width=False, height=True)
         self.lb_v_vs = []
         self.inp_k = []
-        packObject(Label, self.viscosity_win, 20, 10, {"text": 'РЎРІРѕР№СЃС‚РІР°:'})
+        packObject(Label, self.viscosity_win, 20, 10, {"text": 'Свойства:'})
 
         start_y = 40
         counter = 0
@@ -268,7 +297,7 @@ class MyWindow:
         self.input_c.set(self.c)
 
         self.btn_ok = packObject(Button, self.viscosity_win, 20, start_y + (counter + 3) * 25, {
-            "width": "12", "height": "1", "text": "РћРє", "command": self.save_k
+            "width": "12", "height": "1", "text": "Ок", "command": self.save_k
         })
         self.viscosity_win.geometry(f"250x{start_y + (counter + 3) * 25 + 40}")
 
@@ -296,22 +325,22 @@ class MyWindow:
     def param_npc(self):
         if self.browsed_object != () and self.browsed_object['type'] == 'NPC_RP':
             self.param_win = Toplevel()
-            self.param_win.title('РџР°СЂР°РјРµС‚СЂС‹')
+            self.param_win.title('Параметры')
             self.param_win.resizable(width=False, height=True)
             self.update_win_param()
 
             if self.browsed_object != ():
-                packObject(Label, self.param_win, 40, 10, {"text": f'РџР°СЂР°РјРµС‚СЂС‹ РѕР±СЉРµРєС‚Р° {self.browsed_object["id"]}'})
+                packObject(Label, self.param_win, 40, 10, {"text": f'Параметры объекта {self.browsed_object["id"]}'})
 
                 self.btn_add_parametrs = packObject(Button, self.param_win, 20, 40, {
-                    "width": "12", "height": "1", "text": "Р”РѕР±Р°РІРёС‚СЊ", "command": self.add_param
+                    "width": "12", "height": "1", "text": "Добавить", "command": self.add_param
                 })
                 self.btn_update_parametrs = packObject(Button, self.param_win, 120, 40, {
-                    "width": "12", "height": "1", "text": "РћР±РЅРѕРІРёС‚СЊ", "command": self.upd_param
+                    "width": "12", "height": "1", "text": "Обновить", "command": self.upd_param
                 })
-                calc_prop = partial(self.calc_prop, self.browsed_object)
+                calc_prop = partial(self.calc_prop, self.browsed_object, 0)
                 self.btn_calc_prop = packObject(Button, self.param_win, 240, 40, {
-                    "width": "12", "height": "1", "text": "Р”РѕР»Рё", "command": calc_prop
+                    "width": "12", "height": "1", "text": "Доли", "command": calc_prop
                 })
 
     def add_param(self):
@@ -326,16 +355,24 @@ class MyWindow:
         self.param_npc()
 
     def upd_param(self):
+        k = [params[2] for params in self.browsed_object['parametrs']]
         for n, i in enumerate(self.objects):
             if i['type'] == 'NPC_RP' and i['id'] == self.browsed_object['id']:
                 for v, q in zip(self.inp_v, self.inp_q):
                     self.objects[n]['parametrs'].clear()
                 self.objects[n]['abnz'] = {}
 
+        if len(self.inp_v) < len(k):
+            k = k[0:len(self.inp_v)]
+        elif len(self.inp_v) > len(k):
+            k.extend(['0' for i in range(len(self.inp_v) - len(k))])
+
         for n, i in enumerate(self.objects):
             if i['type'] == 'NPC_RP' and i['id'] == self.browsed_object['id']:
+                index = 0
                 for v, q, prop in zip(self.inp_v, self.inp_q, self.lb_prop):
-                    self.objects[n]['parametrs'].append([v.get(), q.get(), '0', prop.cget('text')])
+                    self.objects[n]['parametrs'].append([v.get(), q.get(), k[index], prop.cget('text')])
+                    index += 1
                 for out, a, b, inp_n, z in zip(self.outputs, self.inp_a, self.inp_b, self.inp_n, self.inp_z):
                     self.objects[n]['abnz'][out] = {'a': a.get(), 'b': b.get(), 'n': inp_n.get(), 'z': z.get()}
 
@@ -345,64 +382,94 @@ class MyWindow:
         self.param_win.destroy()
         self.param_npc()
 
-    def calc_prop(self, current_object):
+    # функция расчёта долей (рекурсивная)
+    def calc_prop(self, current_object, counter, save_flag=False):
+        # save_flag - если True, значит работаем по кнопке "Выполнить расчёт". В этом случае у стартовой НПС доли не
+        # выводятся на форму, а записываются в объект
         source = self.getObjInputByTPs(current_object['id'])
+        t = 0
+        sum_prop = 0
         if len(source) > 0:
-            # Р‘С‹Р»Рѕ
+            # Было
             # source_q = float(source[0]['q'])
-            # РЎС‚Р°Р»Рѕ
+            # Стало
             obj_ = None
             for obj in self.objects:
                 if obj['id'] == source[0]['from']:
                     obj_ = obj
-                    self.calc_prop(obj_)
+                    t_, counter, sum_prop_ = self.calc_prop(obj_, counter, save_flag)
+                    t += t_
+                    sum_prop += sum_prop_
                     break
-            tp = self.getTP(source[0]['from'], source[0]['to'])
-            in_G = float(tp['tp_G']) * 1000000000 / (24 * 350 * 800)
-            links_out = self.getObjLinksByTP(current_object['id'], 'output')
-            sum_G = 0
-            for link in links_out:
-                tp = self.getTP(current_object['id'], link['obj']['id'])
-                sum_G += float(tp['tp_G']) * 1000000000 / (24 * 350 * 800)
+            in_G, sum_G = self.in_out_g(current_object)
             source_q = 0
-            index = 0
-            for params in obj_['parametrs']:
-                new_prop = float(params[3]) * in_G / sum_G
-                # new_prop = float(param[1]) * float(param[3]) / sum_G
-                if current_object['id'] == self.browsed_object['id']:
-                    self.lb_source_q[index].config(text=f'q{index + 1} = ' + params[1] + f' ({new_prop})')
-                else:
-                    params[3] = new_prop
-                source_q += new_prop
-                index += 1
-            if current_object['id'] == self.browsed_object['id']:
-                self.lb_source_q[index].config(text=f'РЎСѓРјРјР° РґРѕР»РµР№ = ({source_q})')
+            # index = 0
+            if sum_G > 0:
+                for params in obj_['parametrs']:
+                    new_prop = float(params[3]) * in_G / sum_G
+                    sum_prop += new_prop
+                    # new_prop = float(param[1]) * float(param[3]) / sum_G
+                    # if current_object['id'] == self.browsed_object['id']:
+                    #     self.lb_source_q[index].config(text=f'q{index + 1} = ' + params[1] + f' ({new_prop})')
+                    # else:
+                    #     params[3] = new_prop
+                    if not save_flag:
+                        current_text = self.lb_source_q[counter].cget('text').split(' = ')
+                        self.lb_source_q[counter].config(text=current_text[0] + ' = ' + params[1] + f' ({new_prop})')
+                    # params[3] = new_prop
+                    source_q += new_prop
+                    counter += 1
+                    # index += 1
+            # if current_object['id'] == self.browsed_object['id']:
+                # self.lb_sum_prop.config(text=f'Сумма долей = ({sum_prop})')
+                # self.lb_remain.config(text=f'Осталось = ({1 - sum_prop})')
+                # self.lb_sum_prop.config(text=f'Сумма долей = ({source_q})')
+                # self.lb_remain.config(text=f'Осталось = ({1 - source_q})')
         else:
             source_q = 0
 
         sum_q = 0
-        t = 0
-        # Р•СЃР»Рё СЂР°Р±РѕС‚Р°РµРј СЃ С‚РµРєСѓС‰РёРј РќРџРЎ, С‚Рѕ Р·РЅР°С‡РµРЅРёСЏ Р±РµСЂС‘Рј РёР· РїРѕР»РµР№ РІРІРѕРґР°, РёРЅР°С‡Рµ - РёСЃ СЃРїРёСЃРєР° РїР°СЂР°РјРµС‚СЂРѕРІ
-        if current_object['id'] == self.browsed_object['id']:
+        # Если работаем с текущим НПС, то значения берём из полей ввода, иначе - из списка параметров
+        if current_object['id'] == self.browsed_object['id'] and not save_flag:
             for index in range(len(self.inp_q)):
                 sum_q += float(self.inp_q[index].get())
-            counter = 0
+            index = 0
             for lb_prop in self.lb_prop:
-                curr_q = float(self.inp_q[counter].get())
+                curr_q = float(self.inp_q[index].get())
+                sum_prop += curr_q / (source_q + sum_q)
                 lb_prop.config(text=str(round(curr_q / (source_q + sum_q), 3)))
-                counter += 1
+                index += 1
             for index in range(len(self.lb_prop)):
                 t += float(self.lb_prop[index].cget('text')) * float(current_object['parametrs'][index][2])
+            # self.lb_sum_prop.config(text=f'Сумма долей = ({source_q + sum_q})')
+            # self.lb_remain.config(text=f'Осталось = ({1 - source_q - sum_q})')
+            self.lb_sum_prop.config(text=f'Сумма долей = ({sum_prop})')
+            self.lb_remain.config(text=f'Осталось = ({1 - sum_prop})')
             self.inp_param_t.set(t)
         else:
             for params in current_object['parametrs']:
                 sum_q += float(params[1])
             for params in current_object['parametrs']:
-                curr_q = float(params[1])
-                params[3] = str(round(curr_q / (source_q + sum_q), 3))
-                t += float(params[3]) * float(params[2])
+                if save_flag:
+                    params[3] = str(float(params[1]) / (source_q + sum_q))
+                t += float(params[1]) / (source_q + sum_q) * float(params[2])
 
         current_object['param_t'] = t
+        return t, counter, sum_prop
+
+    def in_out_g(self, current_object):
+        source = self.getObjInputByTPs(current_object['id'])
+        if len(source) > 0:
+            tp = self.getTP(source[0]['from'], source[0]['to'])
+            in_G = float(tp['tp_G']) * 1000000000 / (24 * 350 * 800)
+        else:
+            in_G = 0
+        links_out = self.getObjLinksByTP(current_object['id'], 'output')
+        sum_G = 0
+        for link in links_out:
+            tp = self.getTP(current_object['id'], link['obj']['id'])
+            sum_G += float(tp['tp_G']) * 1000000000 / (24 * 350 * 800)
+        return in_G, sum_G
 
     def remove_param(self, n):
         for j, i in enumerate(self.objects):
@@ -427,11 +494,11 @@ class MyWindow:
         self.inp_a, self.inp_b, self.inp_n, self.inp_z = [], [], [], []
         self.outputs = []
 
-        self.lb_v.append(packObject(Label, self.param_win, 10, 80 + s, {"text": f'Р’С…РѕРґС‹:'}))
+        self.lb_v.append(packObject(Label, self.param_win, 10, 80 + s, {"text": f'Входы:'}))
         s += 40
         self.heith += 40
 
-        # РџРѕРґСЃС‡РёС‚С‹РІР°РµРј, РєР°РєРёРјРё РїРѕ РїРѕСЂСЏРґРєСѓ Р±СѓРґСѓС‚ q, v РґР»СЏ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
+        # Подсчитываем, какими по порядку будут q, v для выбранного объекта
         counter = 0
         for obj in self.objects:
             if obj['type'] == 'NPC_RP' and int(obj['id']) < int(self.browsed_object['id']):
@@ -444,12 +511,12 @@ class MyWindow:
 
             self.lb_v.append(packObject(Label, self.param_win, 10, 80 + s, {"text": f'v{counter + 1}:'}))
             self.inp_v.append(
-                packObject(Entry, self.param_win, 30, 80 + s, {"width": "10", "textvariable": self.input_v}))
+                packObject(Entry, self.param_win, 40, 80 + s, {"width": "10", "textvariable": self.input_v}))
             self.lb_q.append(packObject(Label, self.param_win, 110, 80 + s, {"text": f'q{counter + 1}:'}))
             self.inp_q.append(
-                packObject(Entry, self.param_win, 130, 80 + s, {"width": "10", "textvariable": self.input_q}))
+                packObject(Entry, self.param_win, 140, 80 + s, {"width": "10", "textvariable": self.input_q}))
             action_with_arg = partial(self.remove_param, i)
-            self.btn_del.append(packObject(Button, self.param_win, 200, 75 + s, {"width": "2", "height": "1",
+            self.btn_del.append(packObject(Button, self.param_win, 210, 75 + s, {"width": "2", "height": "1",
                                                                                  "text": "del",
                                                                                  "command": action_with_arg}))
             self.lb_prop.append(packObject(Label, self.param_win, 250, 80 + s, {"text": '0'}))
@@ -463,28 +530,40 @@ class MyWindow:
             self.heith += 40
             self.noheith -= 0
 
-        # РћРїСЂРµРґРµР»СЏРµРј РїРµСЂРІС‹Р№ РёРЅРґРµРєСЃ q СЂРѕРґРёС‚РµР»СЊСЃРєРѕР№ РќРџРЎ Рё РІС‹РІРѕРґРёРј РёС… РЅР° С„РѕСЂРјСѓ
-        source = self.getObjLinksByTP(self.browsed_object['id'], 'input')
-        if len(source) > 0:
-            obj_ = source[0]['obj']
-            counter = 0
-            for obj in self.objects:
-                if obj['type'] == 'NPC_RP' and int(obj['id']) < int(obj_['id']):
-                    counter += len(obj['parametrs'])
-            sum = 0
-            for params in obj_['parametrs']:
-                self.lb_source_q.append(packObject(Label, self.param_win, 110, 80 + s,
-                                                   {"text": f'q{counter + 1} = ' + params[1] + f' ({params[3]})'}))
-                sum += float(params[3])
-                counter += 1
-                s += 15
-                self.heith += 15
-            self.lb_source_q.append(packObject(Label, self.param_win, 110, 80 + s, {"text": f'РЎСѓРјРјР° РґРѕР»РµР№ = ({sum})'}))
-            s += 15
+        # возможно добавить
+        in_g, sum_g = self.in_out_g(self.browsed_object)
+        available = int(sum_g - in_g)
+        self.lb_available = packObject(Label, self.param_win, 110, 80 + s, {"text": f'Возможно добавить: {available}'})
+        s += 20
 
-        # Р’С…РѕРґС‹ q,v
+        # доли предыдущих НПС
+        sources = self.get_sources_chain(self.browsed_object, [])
+        counter = 0
+        sum = 0
+        for obj in self.objects:
+            if obj['type'] == 'NPC_RP' and int(obj['id']) < int(self.browsed_object['id']):
+                if obj in sources:
+                    for params in obj['parametrs']:
+                        sum += float(params[3])
+                        counter += 1
+                        self.lb_source_q.append(packObject(Label, self.param_win, 110, 80 + s,
+                                                           {"text": f'q{counter} = ' + params[1] + f' ({params[3]})'}))
+                        s += 20
+                        self.heith += 20
+                else:
+                    counter += len(obj['parametrs'])
+        for params in self.browsed_object['parametrs']:
+            sum += float(params[3])
+        self.lb_sum_prop = packObject(Label, self.param_win, 110, 80 + s, {"text": f'Сумма долей = ({sum})'})
+        s += 20
+        self.heith += 20
+        self.lb_remain = packObject(Label, self.param_win, 110, 80 + s, {"text": f'Осталось = ({1 - sum})'})
+        s += 20
+        self.heith += 20
+
+        # Входы q,v
         tp_inputs = self.getObjInputByTPs(self.browsed_object['id'])
-        # self.lb_v.append(packObject(Label, self.param_win, 10, 80 + s, {"text": f'Р’С…РѕРґС‹:'}))
+        # self.lb_v.append(packObject(Label, self.param_win, 10, 80 + s, {"text": f'Входы:'}))
         s += 30
         self.heith += 30
         for tpInput in tp_inputs:
@@ -495,9 +574,9 @@ class MyWindow:
             s += 30
             self.heith += 30
 
-        # Р’С‹С…РѕРґС‹ q,v
+        # Выходы q,v
         tp_outputs = self.getObjOutputByTPs(self.browsed_object['id'])
-        self.lb_v.append(packObject(Label, self.param_win, 10, 80 + s, {"text": f'Р’С‹С…РѕРґС‹:'}))
+        self.lb_v.append(packObject(Label, self.param_win, 10, 80 + s, {"text": f'Выходы:'}))
         s += 30
         self.heith += 30
         for tpOutput in tp_outputs:
@@ -540,7 +619,14 @@ class MyWindow:
             self.heith += 30
 
         self.param_win.geometry(f"600x{self.heith}+500+{self.noheith}")
-        self.param_win
+
+    def get_sources_chain(self, current_object, sources):
+        source = self.getObjLinksByTP(current_object['id'], 'input')
+        if len(source) > 0:
+            obj_ = source[0]['obj']
+            self.get_sources_chain(obj_, sources)
+            sources.append(obj_)
+            return sources
 
     def rclick(self, e):
         d = 1000000
@@ -574,7 +660,7 @@ class MyWindow:
         counter = 0
         for obj in self.objects:
 
-            # РјРµРЅСЏРµС‚ С†РІРµС‚ РІС‹Р±СЂР°РЅРЅРѕРіРѕ РѕР±СЉРµРєС‚Р°
+            # меняет цвет выбранного объекта
             filling = "black"
             if self.radio1.get() <= 1 and self.radio2.get() == 1:
                 if 'id' in obj and obj['id'] == self.inp_id.get():
@@ -619,7 +705,7 @@ class MyWindow:
                 self.canvas.create_arc(
                     obj["x"] - 15, obj["y"] - 15, obj["x"] + 15, obj["y"] + 15, start=225, extent=90,
                     fill="white", tag=obj['id'])
-                # СЃС‚СЂРµР»РєР°
+                # стрелка
                 self.canvas.create_line(
                     obj["x"], obj["y"] - 20, obj["x"], obj["y"] - 50,
                     obj["x"], obj["y"] - 20, obj["x"] + 4, obj["y"] - 28,
@@ -636,7 +722,7 @@ class MyWindow:
                                                                                + "\n" + qv, fill="red")
 
             elif obj['type'] == 'tp':
-                # РїСЂРѕРІРµСЂСЏРµРј РїСЂРёСЃСѓС‚СЃС‚РІСѓСЋС‚ Р»Рё npc1 Рё npc2 РІ СЃРїРёСЃРєРµ РѕР±СЉРµРєС‚РѕРІ
+                # проверяем присутствуют ли npc1 и npc2 в списке объектов
                 if obj['npc1'] in list_npc and obj['npc1'] in list_npc:
                     for el in self.objects:
                         if el['type'] == 'NPC' or el['type'] == 'NPC_RP':
@@ -662,22 +748,22 @@ class MyWindow:
                     display_G = int(float(obj['tp_G']) * 1000000000 / (24 * 350 * 800))
                     self.canvas.create_text((v1["x"] + v2["x"]) / 2 + x_p, (v1['y'] + v2['y']) / 2 - y_p, text="D: " +
                                                                                                                obj[
-                                                                                                                   'diameter'] + " РјРј" + "\n" + "L: " +
+                                                                                                                   'diameter'] + " мм" + "\n" + "L: " +
                                                                                                                obj[
-                                                                                                                   'tp_lenth'] + " РєРј"
+                                                                                                                   'tp_lenth'] + " км"
                                                                                                                + "\n" + "G: " + str(
                         display_G),
                                             justify='right')
                     # self.canvas.create_text((v1["x"] + v2["x"]) / 2 + x_p, (v1['y'] + v2['y']) / 2 - y_p, text="D: " +
-                    #                         obj['diameter'] + " РјРј" + "\n" + "L: " + obj['tp_lenth'] + " РєРј"
-                    #                         + "\n" + "G: " + obj['tp_G'] + " РјР»РЅ.С‚",
+                    #                         obj['diameter'] + " мм" + "\n" + "L: " + obj['tp_lenth'] + " км"
+                    #                         + "\n" + "G: " + obj['tp_G'] + " млн.т",
                     #                         justify='right')
 
     def add_object(self, **param):
         object_id = [i['id'] for i in self.objects if i['type'] == 'NPC' or i['type'] == 'NPC_RP']
         object_edge = [(i['npc1'], i['npc2']) for i in self.objects if i['type'] == 'tp']
 
-        # РґРѕР±Р°РІР»РµРЅРёРµ С‚СЂСѓР±РѕРїСЂРѕРІРѕРґР° NPC
+        # добавление трубопровода NPC
         if self.radio1.get() == 0 and self.radio2.get() == 0:
             if param['id'] not in object_id:
                 # self.objects.append({"id": str(param['id']), 'name': str(param['name']), 'type': 'NPC', "x": param['x'],
@@ -689,9 +775,9 @@ class MyWindow:
                                      "y": param['y'], "param_t": param['param_t']
                                      })
             else:
-                messagebox.showinfo('РћС€РёР±РєР°', 'РћР±СЉРµРєС‚ СЃ С‚Р°РєРёРј РёРјРµРЅРµРј СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚!')
+                messagebox.showinfo('Ошибка', 'Объект с таким именем уже существует!')
 
-        # РґРѕР±Р°РІР»РµРЅРёРµ С‚СЂСѓР±РѕРїСЂРѕРІРѕРґР° NPC_RP
+        # добавление трубопровода NPC_RP
         if self.radio1.get() == 1 and self.radio2.get() == 0:
             if param['id'] not in object_id:
                 # self.objects.append({"id": param['id'], 'name': str(param['name']), 'type': 'NPC_RP', "x": param['x'],
@@ -702,17 +788,17 @@ class MyWindow:
                                      "y": param['y'], "param_t": param['param_t'],
                                      'parametrs': []})
             else:
-                messagebox.showinfo('РћС€РёР±РєР°', 'РќРџРЎ СЃ С‚Р°РєРёРј РёРјРµРЅРµРј СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚!')
+                messagebox.showinfo('Ошибка', 'НПС с таким именем уже существует!')
 
         if self.radio1.get() == 2 and self.radio2.get() == 0:
             per = self.inp_tp_first.get(), self.inp_tp_second.get()
 
             if per in object_edge:
-                messagebox.showinfo("Р—Р°РґРІРѕРµРЅРёРµ РѕР±СЉРµРєС‚Р°", "РўСЂСѓР±РѕРїСЂРѕРІРѕРґ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚")
+                messagebox.showinfo("Задвоение объекта", "Трубопровод уже существует")
             elif self.inp_tp_first.get() not in object_id:
-                messagebox.showinfo("404", "HРџРЎ 1 РЅРµ РЅР°Р№РґРµРЅ.")
+                messagebox.showinfo("404", "HПС 1 не найден.")
             elif self.inp_tp_second.get() not in object_id:
-                messagebox.showinfo("404", "РќРџРЎ 2 РЅРµ РЅР°Р№РґРµРЅ.")
+                messagebox.showinfo("404", "НПС 2 не найден.")
             elif self.inp_tp_first.get() in object_id and self.inp_tp_second.get() in object_id:
                 self.objects.append({
                     "diameter": self.inp_tp_diameter.get(), 'type': 'tp', "npc1": self.inp_tp_first.get(),
@@ -720,7 +806,7 @@ class MyWindow:
                 })
 
             else:
-                messagebox.showerror("РћС€РёР±РєР°", f"РќРџРЎ РЅРµ РЅР°Р№РґРµРЅС‹!")
+                messagebox.showerror("Ошибка", f"НПС не найдены!")
 
         self.canvas_update()
 
@@ -750,8 +836,8 @@ class MyWindow:
                         inputText = self.getObjLinksByTPString(links, 'input')
                         outputText = self.getObjLinksByTPString(links, 'output')
 
-                        self.lb_inputs['text'] = "Р’С…РѕРґ: " + inputText
-                        self.lb_outputs['text'] = "Р’С‹С…РѕРґ: " + outputText
+                        self.lb_inputs['text'] = "Вход: " + inputText
+                        self.lb_outputs['text'] = "Выход: " + outputText
 
             # elif i['type'] == 'NPC_RP' and self.radio2.get() == 1:
             #     if sqr(self.X - i["x"]) + sqr(self.Y - i["y"]) < d:
@@ -899,7 +985,7 @@ class MyWindow:
         self.objects = []
         self.canvas_update()
 
-    # СЃРѕРєСЂС‹С‚РёРµ РїР°СЂР°РјРµС‚СЂРѕРІ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РѕР±СЉРµРєС‚Р° (С‚СЂСѓР±РѕРїСЂРѕРІРѕРґ РёР»Рё РќРџРЎ)
+    # сокрытие параметров в зависимости от объекта (трубопровод или НПС)
     def updateParametrs(self):
         if self.radio1.get() == 0:
             hide(
@@ -961,19 +1047,19 @@ class MyWindow:
                 show(self.btn_remove_object, self.btn_update_object, self.tp_lenth, self.btn_calc_Q, self.lb_Q,
                      self.btn_calc_V, self.lb_V)
 
-    # 2. РЈР±СЂР°С‚СЊ РѕС€РёР±РєСѓ РІ СЃС‡РµС‚Рµ РёРЅРґРµРєСЃРѕРІ РїСЂРё РґРѕР±Р°РІР»РµРЅРёРё РЅРѕРІС‹С… СЌР»РµРјРµРЅС‚РѕРІ
-    # РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ РёРјСЏ РѕР±СЉРµРєС‚Р°
+    # 2. Убрать ошибку в счете индексов при добавлении новых элементов
+    # максимальное имя объекта
     def getMaxId(self):
         maxname = 0
         for obj in self.objects:
-            # РµСЃР»Рё РµСЃС‚СЊ СЃРІРѕР№СЃС‚РІРѕ 'id' Сѓ РѕР±СЉРµРєС‚Р°
+            # если есть свойство 'id' у объекта
             if 'id' in obj:
-                # РїСЂРµРѕР±СЂР°Р·СѓРµРј РІ С‡РёСЃР»Рѕ Рё СЃСЂР°РІРЅРёРІР°РµРј СЃ РјР°РєСЃРёРјР°Р»СЊРЅС‹Рј
+                # преобразуем в число и сравниваем с максимальным
                 intname = int(obj['id'])
                 if intname > maxname:
-                    # РµСЃР»Рё Р±РѕР»СЊС€Рµ РјР°РєСЃРёРјР°Р»СЊРЅРѕРіРѕ - СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј РєР°Рє РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ
+                    # если больше максимального - устанавливаем как максимальное
                     maxname = intname
-        # СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј РґР»СЏ РЅРѕРІРѕРіРѕ РґРѕР±Р°РІР»СЏРµРјРѕРіРѕ РѕР±СЉРµРєС‚Р° РёРјСЏ РєР°Рє РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ + 1
+        # устанавливаем для нового добавляемого объекта имя как максимальное + 1
         return str(maxname + 1)
 
     def getObj(self, id):
@@ -983,7 +1069,7 @@ class MyWindow:
                     return obj
 
     def getObjName(self, obj):
-        objname = "РќРџРЎ" + obj['id']
+        objname = "НПС" + obj['id']
         if obj['name']:
             objname = obj['name']
         return objname
@@ -1050,14 +1136,14 @@ class MyWindow:
                 result = result + line['name']
                 counter = counter + 1
         if counter > 0:
-            result = " " + str(counter) + " РѕС‚ " + result
+            result = " " + str(counter) + " от " + result
         return result
 
     def click(self, e):
 
-        # Р”РѕР±Р°РІР»РµРЅРёРµ
+        # Добавление
         if self.radio2.get() == 0:
-            # РќРџРЎ
+            # НПС
             if self.radio1.get() == 0:
 
                 self.inp_id.set(self.getMaxId())
@@ -1068,7 +1154,7 @@ class MyWindow:
                 self.add_object(id=self.inp_id.get(), name=self.inp_name.get(), x=e.x, y=e.y,
                                 param_t=self.inp_param_t.get())
 
-            # РќРџРЎ СЃ СЂРµР·РµСЂРІСѓР°СЂРЅС‹Рј Р±Р°РєРѕРј
+            # НПС с резервуарным баком
             elif self.radio1.get() == 1:
                 self.inp_id.set(self.getMaxId())
                 # self.add_object(id=self.inp_id.get(), name=self.inp_name.get(), x=e.x, y=e.y,
@@ -1078,7 +1164,7 @@ class MyWindow:
                 self.add_object(id=self.inp_id.get(), name=self.inp_name.get(), x=e.x, y=e.y,
                                 param_t=self.inp_param_t.get())
 
-            # РўСЂСѓР±РѕРїСЂРѕРІРѕРґ
+            # Трубопровод
             elif self.radio1.get() == 2:
                 self.getnearestobject()
 
@@ -1096,8 +1182,8 @@ class MyWindow:
 if __name__ == '__main__':
     window = Tk()
     mywin = MyWindow(window)
-    window.title("РЎС…РµРјР° СЃРёСЃС‚РµРјС‹ РЅРµС„С‚РµРїСЂРѕРІРѕРґР°")
-    window.geometry("1145x598")
+    window.title("Схема системы нефтепровода")
+    window.geometry("1145x628")
 
     window.resizable(width=False, height=False)
     window.mainloop()
